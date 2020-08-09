@@ -23,3 +23,11 @@
     - m : source matrix suite dir
     - t : type of matrix suite (pyfr or synth)
     - n : number of benchmark runs (Default is 3)
+
+## Hardcoded values
+  - Block alignment = 48
+    - src/benchmark/common.h
+    - src/plots/tools.py
+
+  - XEON_8175M Stats
+    - src/plots/tools.py

@@ -53,10 +53,19 @@ python3 src/plot/pickle_runs.py $MAT_TYPE $N_RUNS $LOG_DIR $TIMESTAMP $TEST_GIMM
 # Plot
 if [ $MAT_TYPE == "pyfr" ]
 then
-  # plot normal
-  # plot roofline 
+  mkdir -p $PLOT_DIR/quad
+  mkdir -p $PLOT_DIR/hex
+  mkdir -p $PLOT_DIR/tet
+  mkdir -p $PLOT_DIR/tri
+  mkdir -p $PLOT_DIR/roofline
+  
+  python3 src/plot/pyfr.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR
+  # plot roofline
 elif [ $MAT_TYPE == "synth" ]
 then
-  # plot normal
+  mkdir -p $PLOT_DIR/synth
+  mkdir -p $PLOT_DIR/roofline
+
+  python3 src/plot/synth.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR
   # plot roofline
 fi
