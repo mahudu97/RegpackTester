@@ -5,13 +5,7 @@ import pickle
 import os
 import numpy as np
 
-AVX_512_WIDTH = 8
-
-AVX512_FLOPS_PER_CYCLE = 8*2 # DP FMA
-NUM_AVX512_UNITS = 2
-AVX512_FREQ = 2.4 # All Cores Active AVX512 Boost (GHz)
-XEON_8175M_PEAK_FLOPS = AVX512_FREQ * NUM_AVX512_UNITS * AVX512_FLOPS_PER_CYCLE
-XEON_8175M_PEAK_BW = 13.5163 # GB/s
+from cpu_stats import AVX_512_WIDTH
 
 B_TARGET_PANEL_WIDTH = 48
 
@@ -122,30 +116,139 @@ def sort_values(x_term, trait, mat_flops, b_num_col, gimmik, t='best'):
         return custom_x, custom_y, ref_x, ref_y
 
 # sort_values(x_term, run, mat_flops, b_num_col, gimmik, t='best'):
-def get_perf(runs, shape, x_term, mat_flops, b_num_col, gimmik, t='best'):
+def get_perf(runs, n_runs, shape, x_term, mat_flops, b_num_col, gimmik, t='best'):
     if gimmik == "1":
-        custom_x1, custom_y1, _, ref_y1, _, gimmik_y1 = \
-            sort_values(x_term, runs[0][shape], mat_flops, b_num_col, gimmik, t)
-        _, custom_y2, _, ref_y2, _, gimmik_y2 = \
-            sort_values(x_term, runs[1][shape], mat_flops, b_num_col, gimmik, t)
-        _, custom_y3, _, ref_y3, _, gimmik_y3 = \
-            sort_values(x_term, runs[2][shape], mat_flops, b_num_col, gimmik, t)
+        custom_x, custom_y, ref_y, gimmik_y = [], [], [], []
+        for i in range(n_runs):
+            cx1, cy1, _, ry1, _, gy1 = \
+                sort_values(x_term, runs[i][shape], mat_flops, b_num_col, gimmik, t)
+            custom_x.append(cx1)
+            custom_y.append(cy1)
+            ref_y.append(ry1)
+            gimmik_y.append(gy1)
 
-        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y1, custom_y2, custom_y3)]
-        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y1, ref_y2, ref_y3)]
-        gimmik_y_avg = [sum(elem)/len(elem) for elem in zip(gimmik_y1, gimmik_y2, gimmik_y3)]
+        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y)]
+        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y)]
+        gimmik_y_avg = [sum(elem)/len(elem) for elem in zip(gimmik_y)]
 
-        return custom_x1, custom_y_avg, ref_y_avg, gimmik_y_avg
+        return custom_x, custom_y_avg, ref_y_avg, gimmik_y_avg
 
     else:
-        custom_x1, custom_y1, _, ref_y1 = \
-            sort_values(x_term, runs[0][shape], mat_flops, b_num_col, gimmik, t)
-        _, custom_y2, _, ref_y2 = \
-            sort_values(x_term, runs[1][shape], mat_flops, b_num_col, gimmik, t)
-        _, custom_y3, _, ref_y3 = \
-            sort_values(x_term, runs[2][shape], mat_flops, b_num_col, gimmik, t)
+        custom_x, custom_y, ref_y = [], [], []
+        for i in range(n_runs):
+            cx1, cy1, _, ry1, _ = \
+                sort_values(x_term, runs[i][shape], mat_flops, b_num_col, gimmik, t)
+            custom_x.append(cx1)
+            custom_y.append(cy1)
+            ref_y.append(ry1)
 
-        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y1, custom_y2, custom_y3)]
-        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y1, ref_y2, ref_y3)]
+        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y)]
+        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y)]
 
-        return custom_x1, custom_y_avg, ref_y_avg
+        return custom_x, custom_y_avg, ref_y_avg
+
+# trait is a list formed from runs: i.e run["quad"] for pyfr mats
+def calc_GFLOPs(mat_FLOPS, mat_names, trait, b_num_col, gimmik, t='best'):
+    _NUM_PANELS = b_num_col / B_TARGET_PANEL_WIDTH
+
+    custom_GFLOPs = []
+    ref_GFLOPs = []
+    if gimmik:
+        gimmik_GFLOPs = []
+
+    for i, mat_name in enumerate(mat_names):
+        _FLOPS_PER_PANEL = mat_FLOPS[mat_name]
+        custom_inner = []
+        ref_inner = []
+        if gimmik:
+            gimmik_inner = []
+
+        for run in trait:
+            # *1e-3 for ms to s
+            time_per_panel_custom = (run['xsmm_custom_'+t][i]*1e-3)/_NUM_PANELS
+            custom_inner.append(_FLOPS_PER_PANEL / time_per_panel_custom)
+
+            time_per_panel_ref   = (run['xsmm_reference_'+t][i]*1e-3)/_NUM_PANELS
+            ref_inner.append(_FLOPS_PER_PANEL / time_per_panel_ref)
+
+            if gimmik:
+                time_per_panel_gimmik = (run['gimmik_'+t][i]*1e-3)/_NUM_PANELS
+                gimmik_inner.append(_FLOPS_PER_PANEL / time_per_panel_gimmik)
+
+        custom_avg = sum(custom_inner) / len(custom_inner)
+        custom_GFLOPs.append(custom_avg / 1e9)
+
+        ref_avg = sum(ref_inner) / len(ref_inner)
+        ref_GFLOPs.append(ref_avg / 1e9)
+
+        if gimmik:
+            gimmik_avg = sum(gimmik_inner) / len(gimmik_inner)
+            gimmik_GFLOPs.append(gimmik_avg / 1e9)
+
+    if gimmik:
+        return custom_GFLOPs, ref_GFLOPs, gimmik_GFLOPs
+    else:
+        return custom_GFLOPs, ref_GFLOPs
+
+def _calc_mem_spMM_beta_0(mat):
+    # dont count A load
+    num_panels = B_TARGET_PANEL_WIDTH/AVX_512_WIDTH
+    # beta = 0
+    mem = 0
+
+    # load B
+    for col in mat.T:
+        has_A = False
+        for el in col:
+            if el != 0:
+                has_A = True
+        # at least one A - load stride of B into cache
+        if has_A:
+            mem += 8*8
+
+    # store C
+    for row in mat:
+        has_A = False
+        for el in row:
+            if el != 0:
+                has_A = True
+        # at least one A - store a C stride
+        if has_A:
+            mem += 8*8
+
+    return (mem * num_panels)# + mem_A # dont repeat A load
+
+def _calc_mem_dense_beta_0(mat):
+    # dont count A load
+    num_panels = B_TARGET_PANEL_WIDTH/AVX_512_WIDTH
+    # beta = 0
+    mem = 0
+
+    # load B
+    for _ in mat.T:
+        mem += 8*8
+
+    # store C
+    for _ in mat:
+        mem += 8*8
+
+    return (mem * num_panels)# + mem_A # dont repeat A load
+
+# returns AIs for XSMM SpMM, dense, (and GiMMiK)
+def get_AIs(mat_paths, gimmik):
+    spMM_AIs, dense_AIs = [], []
+
+    for mat_path in mat_paths:
+        with open(mat_path) as f:
+            test_mat = clean(np.loadtxt(f))
+            flops_per_panel = basic_flops(test_mat, B_TARGET_PANEL_WIDTH)
+            spmm_mem_per_panel = _calc_mem_spMM_beta_0(test_mat)
+            dense_mem_per_panel = _calc_mem_dense_beta_0(test_mat)
+            spMM_AIs.append( flops_per_panel / spmm_mem_per_panel )
+            dense_AIs.append( flops_per_panel / dense_mem_per_panel )
+
+    if gimmik:
+        # gimmik has same AI as xsmm SpMM
+        return spMM_AIs, dense_AIs, spMM_AIs
+    else:
+        return spMM_AIs, dense_AIs

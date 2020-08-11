@@ -44,10 +44,10 @@ def plot(runs, mat_flops, shape, title, limit_y=False):
 
         if TEST_GIMMIK == "1":
             x_values, custom_y_avg, ref_y_avg, gimmik_y_avg = \
-                get_perf(runs, shape, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
+                get_perf(runs, N_RUNS, shape, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
         else:
             x_values, custom_y_avg, ref_y_avg = \
-                get_perf(runs, shape, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
+                get_perf(runs, N_RUNS, shape, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
 
         plt.plot(x_values, custom_y_avg, label="Custom LIBXSMM", color="limegreen", marker=".")
         plt.plot(x_values, ref_y_avg, label="Reference LIBXSMM", color="maroon", marker=".")
@@ -61,7 +61,7 @@ def plot(runs, mat_flops, shape, title, limit_y=False):
         if limit_y:
             plt.ylim(top=10e9)
         plt.legend()
-        plt.savefig(os.path.join(PLOT_DIR,shape,"{}.pdf".format(x_term)))
+        plt.savefig(os.path.join(PLOT_DIR,shape,"{}_{}.pdf".format(x_term, TIMESTAMP)))
 
 plot(runs, mat_flops, "quad", "Quad", limit_y=True)
 plot(runs, mat_flops, "hex", "Hex", limit_y=True)

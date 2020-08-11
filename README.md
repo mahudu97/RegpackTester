@@ -23,6 +23,7 @@
     - m : source matrix suite dir
     - t : type of matrix suite (pyfr or synth)
     - n : number of benchmark runs (Default is 3)
+    - d : if reference XSMM is dense routine (1) (Default is 0)
 
 ## Hardcoded values
   - Block alignment = 48
@@ -30,4 +31,4 @@
     - src/plots/tools.py
 
   - XEON_8175M Stats
-    - src/plots/tools.py
+    - src/plots/cpu_stats.py

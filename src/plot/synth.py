@@ -35,10 +35,10 @@ def plot(runs, mat_flops, x_term, trait, xlabel, title, save_as, \
 
     if TEST_GIMMIK == "1":
         x_values, custom_y_avg, ref_y_avg, gimmik_y_avg = \
-            get_perf(runs, trait, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
+            get_perf(runs, N_RUNS, trait, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
     else:
         x_values, custom_y_avg, ref_y_avg = \
-            get_perf(runs, trait, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
+            get_perf(runs, N_RUNS, trait, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
 
         plt.plot(x_values, custom_y_avg, label="Custom LIBXSMM", color="limegreen", marker=".")
         plt.plot(x_values, ref_y_avg, label="Reference LIBXSMM", color="maroon", marker=".")
@@ -54,7 +54,7 @@ def plot(runs, mat_flops, x_term, trait, xlabel, title, save_as, \
         plt.xticks(x_values)
     plt.title(title)
     plt.legend()
-    plt.savefig(os.path.join(PLOT_DIR,"synth/{}.pdf".format(save_as)))
+    plt.savefig(os.path.join(PLOT_DIR,"synth/{}_{}.pdf".format(save_as, TIMESTAMP)))
 
 ### Vary Rows ###
 xlabel="Number of Rows"

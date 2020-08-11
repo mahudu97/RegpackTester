@@ -8,8 +8,10 @@ GIMMIK_DIR=./../GiMMiK
 
 B_NUM_COL=192000
 
-while getopts ":g:t:" opt; do
+while getopts ":d:t:" opt; do
   case $opt in
+    d) REF_IS_DENSE"${OPTARG:-$0}"
+    ;;
     g) TEST_GIMMIK="${OPTARG:-$0}"
     ;;
     m) MATS_DIR="$OPTARG"
@@ -53,18 +55,18 @@ python3 src/plot/pickle_runs.py $MAT_TYPE $N_RUNS $LOG_DIR $TIMESTAMP $TEST_GIMM
 # Plot
 if [ $MAT_TYPE == "pyfr" ]
 then
-  mkdir -p $PLOT_DIR/quad
-  mkdir -p $PLOT_DIR/hex
-  mkdir -p $PLOT_DIR/tet
-  mkdir -p $PLOT_DIR/tri
-  mkdir -p $PLOT_DIR/roofline
-  
+  mkdir -p $PLOT_DIR/pyfr/quad
+  mkdir -p $PLOT_DIR/pyfr/hex
+  mkdir -p $PLOT_DIR/pyfr/tet
+  mkdir -p $PLOT_DIR/pyfr/tri
+  mkdir -p $PLOT_DIR/pyfr/roofline
+
   python3 src/plot/pyfr.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR
-  # plot roofline
+  python3 src/plot/pyfr+roofline.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR $REF_IS_DENSE
 elif [ $MAT_TYPE == "synth" ]
 then
   mkdir -p $PLOT_DIR/synth
-  mkdir -p $PLOT_DIR/roofline
+  mkdir -p $PLOT_DIR/synth/roofline
 
   python3 src/plot/synth.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR
   # plot roofline
