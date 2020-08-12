@@ -22,31 +22,37 @@ while getopts ":d:t:" opt; do
     ;;
     n) N_RUNS="${OPTARG:-$3}"
     ;;
+    s) SKIP_BENCH="${OPTARG:-$"0"}" # 0 don't skip, otherwise == timestamp of previous benchmark
+    ;;
     \?) echo "Invalid option -$OPTARG" >&2
     ;;
   esac
 done
 
-echo "Building LIBXSMM libraries"
-cd $XSMM_REFERENCE_DIR
-make realclean
-make -j
-cd $XSMM_CUSTOM_DIR
-make realclean
-make -j
+# run benchmark
+if [ $SKIP_BENCH == "0" ]
+then
+  echo "Building LIBXSMM libraries"
+  cd $XSMM_REFERENCE_DIR
+  make realclean
+  make -j
+  cd $XSMM_CUSTOM_DIR
+  make realclean
+  make -j
 
-TIMESTAMP="$(date +"%T")"
-echo "Using $TIMESTAMP to stamp log and plot files"
+  TIMESTAMP="$(date +"%T")"
+  echo "Using $TIMESTAMP to stamp log and plot files"
 
-cd $WD
+  cd $WD
 
-# Perform N benchmark runs
-for i in {1..$N_RUNS}
-do
-  echo "Starting benchmark run $i"
-  python3 src/benchmark.py $MATS_DIR $WD $B_NUM_COL $TEST_GIMMIK $ > $LOG_DIR/run_${TIMESTAMP}_$i.out 2> $LOG_DIR/run_${TIMESTAMP}_$i.err
-  echo "Finished benchmark run $i"
-done
+  # Perform N benchmark runs
+  for i in {1..$N_RUNS}
+  do
+    echo "Starting benchmark run $i"
+    python3 src/benchmark.py $MATS_DIR $WD $B_NUM_COL $TEST_GIMMIK $ > $LOG_DIR/run_${TIMESTAMP}_$i.out 2> $LOG_DIR/run_${TIMESTAMP}_$i.err
+    echo "Finished benchmark run $i"
+  done
+fi
 
 # Sort log data and pickle for plotting
 mkdir -p bin/log_data
@@ -69,5 +75,5 @@ then
   mkdir -p $PLOT_DIR/synth/roofline
 
   python3 src/plot/synth.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR
-  # plot roofline
+  python3 src/plot/pyfr+roofline.py $MATS_DIR $N_RUNS $B_NUM_COL $TEST_GIMMIK $TIMESTAMP $PLOT_DIR $REF_IS_DENSE
 fi

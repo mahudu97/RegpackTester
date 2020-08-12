@@ -10,7 +10,6 @@ Made to compare the Register Packing addition to LIBXSMM small-sparse A operator
  - GCC
  - Python
  - numpy, matplotlib
- - git
  - Reference LIBXSSM in "./../libxsmm_reference"
  - Custom LIBXSSM in "./../libxsmm_custom"
  - OpenBlas build in "./../OpenBlas-build"
@@ -29,6 +28,9 @@ Run `./scripts/benchmark.sh` with the following options
   - -t : type of matrix suite (pyfr or synth)
   - -n : number of benchmark runs (Default is 3)
   - -d : if reference XSMM is dense routine (1) (Default is 0)
+  - -s : skip benchmark process, plot a previous run
+    - Other options above still required
+    - Default is 0 (don't skip)  
 
 ## Hardcoded values
 - Block alignment = 48
