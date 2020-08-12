@@ -9,6 +9,8 @@
 #include "common.h"
 #include <libxsmm.h>
 
+void exec_xsmm(const double *b, double *c, int n, const libxsmm_dfsspmdm *xsmm_d);
+
 struct benchmark_data benchmark_xsmm(double *b, double *c, int num_col, libxsmm_dfsspmdm *xsmm_d) {
     struct benchmark_data b_data;
     double times[MAX_REPS]; 

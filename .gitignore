@@ -1,0 +1,3 @@
+bin/
+scripts/py/__pycache__/
+src/plot/__pycache__/

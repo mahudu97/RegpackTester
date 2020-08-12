@@ -7,6 +7,7 @@
 #include <float.h>
 
 #include "common.h"
+#include "gimmik.h"
 
 struct benchmark_data benchmark_gimmik(double *b, double *c, int num_col, int ldb, int ldc) {
     struct benchmark_data b_data;

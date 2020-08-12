@@ -3,15 +3,15 @@ import os
 import sys
 import numpy as np
 
-from .tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
+from tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
 
 if len(sys.argv) < 7:
     print("expected 6 arguments: mat_dir n_runs b_num_col test_gimmik TIMESTAMP plot_dir")
     exit(1)
 
 MAT_PATH = sys.argv[1]
-N_RUNS = sys.argv[2]
-B_NUM_COL = sys.argv[3]
+N_RUNS = int(sys.argv[2])
+B_NUM_COL = int(sys.argv[3])
 TEST_GIMMIK = sys.argv[4]
 TIMESTAMP = sys.argv[5]
 PLOT_DIR = sys.argv[6]
@@ -40,21 +40,21 @@ def plot(runs, mat_flops, x_term, trait, xlabel, title, save_as, \
         x_values, custom_y_avg, ref_y_avg = \
             get_perf(runs, N_RUNS, trait, x_term, mat_flops, B_NUM_COL, TEST_GIMMIK)
 
-        plt.plot(x_values, custom_y_avg, label="Custom LIBXSMM", color="limegreen", marker=".")
-        plt.plot(x_values, ref_y_avg, label="Reference LIBXSMM", color="maroon", marker=".")
-        if TEST_GIMMIK == "1":
-            plt.plot(x_values, gimmik_y_avg, label="GiMMiK", color="orange", marker=".")
+    plt.plot(x_values, custom_y_avg, label="Custom LIBXSMM", color="limegreen", marker=".")
+    plt.plot(x_values, ref_y_avg, label="Reference LIBXSMM", color="maroon", marker=".")
+    if TEST_GIMMIK == "1":
+        plt.plot(x_values, gimmik_y_avg, label="GiMMiK", color="orange", marker=".")
 
     plt.xlabel(xlabel)
     plt.ylabel("Pseudo-FLOP/s")
-    plt.yscale("log", basey=10)
+    plt.yscale("log", base=10)
     if x_logscale:
-        plt.xscale("log", basex=2)
+        plt.xscale("log", base=2)
     elif set_x_ticks:
         plt.xticks(x_values)
     plt.title(title)
     plt.legend()
-    plt.savefig(os.path.join(PLOT_DIR,"synth/{}_{}.pdf".format(save_as, TIMESTAMP)))
+    plt.savefig(os.path.join(PLOT_DIR,"synth","{}_{}.pdf".format(save_as, TIMESTAMP)), bbox_inches='tight')
 
 ### Vary Rows ###
 xlabel="Number of Rows"

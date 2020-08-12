@@ -12,4 +12,4 @@ example_mats_l240 : pyfr matrices with over 240 distinct non-zeros
 ## Synthetic Suite
 synth_mats : entire set of synthetic matrices made with ./../src/proj_helpers/create_synthetic_mats.ipynb
 
-synth_mats_small : subset of above synthetic matrices with up to 31 distinct non-zeros  
+synth_mats_small : subset of above synthetic matrices with up to 31 distinct non-zeros

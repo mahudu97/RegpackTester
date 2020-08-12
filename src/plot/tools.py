@@ -5,7 +5,7 @@ import pickle
 import os
 import numpy as np
 
-from .cpu_stats import AVX_512_WIDTH
+from cpu_stats import AVX_512_WIDTH
 
 B_TARGET_PANEL_WIDTH = 48
 
@@ -111,7 +111,7 @@ def sort_values(x_term, trait, mat_flops, b_num_col, gimmik, t='best'):
         gimmik_x.sort()
 
     if gimmik == "1":
-        return custom_x, custom_y, ref_x, ref_y. gimmik_x, gimmik_y
+        return custom_x, custom_y, ref_x, ref_y, gimmik_x, gimmik_y
     else:
         return custom_x, custom_y, ref_x, ref_y
 
@@ -127,43 +127,43 @@ def get_perf(runs, n_runs, shape, x_term, mat_flops, b_num_col, gimmik, t='best'
             ref_y.append(ry1)
             gimmik_y.append(gy1)
 
-        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y)]
-        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y)]
-        gimmik_y_avg = [sum(elem)/len(elem) for elem in zip(gimmik_y)]
+        custom_y_avg = [sum(elem)/len(elem) for elem in zip(*custom_y)]
+        ref_y_avg = [sum(elem)/len(elem) for elem in zip(*ref_y)]
+        gimmik_y_avg = [sum(elem)/len(elem) for elem in zip(*gimmik_y)]
 
-        return custom_x, custom_y_avg, ref_y_avg, gimmik_y_avg
+        return custom_x[0], custom_y_avg, ref_y_avg, gimmik_y_avg
 
     else:
         custom_x, custom_y, ref_y = [], [], []
         for i in range(n_runs):
-            cx1, cy1, _, ry1, _ = \
+            cx1, cy1, _, ry1 = \
                 sort_values(x_term, runs[i][shape], mat_flops, b_num_col, gimmik, t)
             custom_x.append(cx1)
             custom_y.append(cy1)
             ref_y.append(ry1)
 
-        custom_y_avg = [sum(elem)/len(elem) for elem in zip(custom_y)]
-        ref_y_avg = [sum(elem)/len(elem) for elem in zip(ref_y)]
+        custom_y_avg = [sum(elem)/len(elem) for elem in zip(*custom_y)]
+        ref_y_avg = [sum(elem)/len(elem) for elem in zip(*ref_y)]
 
-        return custom_x, custom_y_avg, ref_y_avg
+        return custom_x[0], custom_y_avg, ref_y_avg
 
-# trait is a list formed from runs: i.e run["quad"] for pyfr mats
-def calc_GFLOPs(mat_FLOPS, mat_names, trait, b_num_col, gimmik, t='best'):
+# data is a list formed from runs: i.e run["quad"] for pyfr mats
+def calc_GFLOPs(mat_FLOPS, mat_names, data, b_num_col, gimmik, t='best'):
     _NUM_PANELS = b_num_col / B_TARGET_PANEL_WIDTH
 
     custom_GFLOPs = []
     ref_GFLOPs = []
-    if gimmik:
+    if gimmik == "1":
         gimmik_GFLOPs = []
 
     for i, mat_name in enumerate(mat_names):
         _FLOPS_PER_PANEL = mat_FLOPS[mat_name]
         custom_inner = []
         ref_inner = []
-        if gimmik:
+        if gimmik == "1":
             gimmik_inner = []
 
-        for run in trait:
+        for run in data:
             # *1e-3 for ms to s
             time_per_panel_custom = (run['xsmm_custom_'+t][i]*1e-3)/_NUM_PANELS
             custom_inner.append(_FLOPS_PER_PANEL / time_per_panel_custom)
@@ -171,7 +171,7 @@ def calc_GFLOPs(mat_FLOPS, mat_names, trait, b_num_col, gimmik, t='best'):
             time_per_panel_ref   = (run['xsmm_reference_'+t][i]*1e-3)/_NUM_PANELS
             ref_inner.append(_FLOPS_PER_PANEL / time_per_panel_ref)
 
-            if gimmik:
+            if gimmik == "1":
                 time_per_panel_gimmik = (run['gimmik_'+t][i]*1e-3)/_NUM_PANELS
                 gimmik_inner.append(_FLOPS_PER_PANEL / time_per_panel_gimmik)
 
@@ -181,11 +181,11 @@ def calc_GFLOPs(mat_FLOPS, mat_names, trait, b_num_col, gimmik, t='best'):
         ref_avg = sum(ref_inner) / len(ref_inner)
         ref_GFLOPs.append(ref_avg / 1e9)
 
-        if gimmik:
+        if gimmik == "1":
             gimmik_avg = sum(gimmik_inner) / len(gimmik_inner)
             gimmik_GFLOPs.append(gimmik_avg / 1e9)
 
-    if gimmik:
+    if gimmik == "1":
         return custom_GFLOPs, ref_GFLOPs, gimmik_GFLOPs
     else:
         return custom_GFLOPs, ref_GFLOPs
@@ -247,7 +247,7 @@ def get_AIs(mat_paths, gimmik):
             spMM_AIs.append( flops_per_panel / spmm_mem_per_panel )
             dense_AIs.append( flops_per_panel / dense_mem_per_panel )
 
-    if gimmik:
+    if gimmik == "1":
         # gimmik has same AI as xsmm SpMM
         return spMM_AIs, dense_AIs, spMM_AIs
     else:

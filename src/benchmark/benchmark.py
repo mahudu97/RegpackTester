@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-from __future__ import print_function
 import os
 import subprocess
 import sys
@@ -75,8 +73,12 @@ def benchmark_matrix(file_name, num_col_b, gimmik):
         result["speedup_best_over_gim"] = result["gimmik_best"] / result["xsmm_custom_best"]
         result["speedup_avg_over_gim"] = result["gimmik_avg"] / result["xsmm_custom_avg"]
 
-    print("Finished running in", str(min(result["xsmm_reference_best"], \
-        result["xsmm_custom_best"], result["gimmik_best"])) + "ms", file=sys.stderr)
+    if gimmik == "1":
+        print("Finished running in", str(min(result["xsmm_reference_best"], \
+            result["xsmm_custom_best"], result["gimmik_best"])) + "ms", file=sys.stderr)
+    else:
+        print("Finished running in", str(min(result["xsmm_reference_best"], \
+            result["xsmm_custom_best"])) + "ms", file=sys.stderr)
 
     pp.pprint(result, compact=True, width=1000)
 

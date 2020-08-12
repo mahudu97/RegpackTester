@@ -30,7 +30,7 @@ Run `./scripts/benchmark.sh` with the following options
   - -d : if reference XSMM is dense routine (1) (Default is 0)
   - -s : skip benchmark process, plot a previous run
     - Other options above still required
-    - Default is 0 (don't skip)  
+    - Default is 0 (don't skip)
 
 ## Hardcoded values
 - Block alignment = 48

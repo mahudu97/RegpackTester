@@ -13,6 +13,8 @@ python3 scripts/py/generate_c_kernels.py $FILENAME $TEST_GIMMIK
 make bin/benchmark_xsmm_reference
 make bin/benchmark_xsmm_custom
 
-if [ $TEST_GIMMIK -eq 1 ] then
-  make bin/benchmark_gimmik
+if [ "$TEST_GIMMIK" = "1" ]
+then
+	make bin/benchmark_gimmik
 fi
+

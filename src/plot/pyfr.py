@@ -3,15 +3,15 @@ import os
 import sys
 import numpy as np
 
-from .tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
+from tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
 
 if len(sys.argv) < 7:
     print("expected 6 arguments: mat_dir n_runs b_num_col test_gimmik TIMESTAMP plot_dir")
     exit(1)
 
 MAT_PATH = sys.argv[1]
-N_RUNS = sys.argv[2]
-B_NUM_COL = sys.argv[3]
+N_RUNS = int(sys.argv[2])
+B_NUM_COL = int(sys.argv[3])
 TEST_GIMMIK = sys.argv[4]
 TIMESTAMP = sys.argv[5]
 PLOT_DIR = sys.argv[6]
@@ -56,12 +56,12 @@ def plot(runs, mat_flops, shape, title, limit_y=False):
 
         plt.xlabel(xlabels[i])
         plt.ylabel("Pseudo-FLOP/s")
-        plt.yscale("log", basey=10)
+        plt.yscale("log", base=10)
         plt.title("Quad: " + xtitles[i] + " vs Pseudo-FLOP/s")
         if limit_y:
             plt.ylim(top=10e9)
         plt.legend()
-        plt.savefig(os.path.join(PLOT_DIR,shape,"{}_{}.pdf".format(x_term, TIMESTAMP)))
+        plt.savefig(os.path.join(PLOT_DIR,"pyfr",shape,"{}_{}.pdf".format(x_term, TIMESTAMP)), bbox_inches='tight')
 
 plot(runs, mat_flops, "quad", "Quad", limit_y=True)
 plot(runs, mat_flops, "hex", "Hex", limit_y=True)

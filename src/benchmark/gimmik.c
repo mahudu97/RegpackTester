@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 #include "common.h"
-#include "gimmik.h"
+#include "gimmik_b.h"
 
 int main(int argc, char **argv) {
     if (argc != 3) {
