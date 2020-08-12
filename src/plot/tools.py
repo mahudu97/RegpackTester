@@ -5,7 +5,7 @@ import pickle
 import os
 import numpy as np
 
-from cpu_stats import AVX_512_WIDTH
+from .cpu_stats import AVX_512_WIDTH
 
 B_TARGET_PANEL_WIDTH = 48
 

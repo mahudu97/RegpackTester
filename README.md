@@ -35,5 +35,5 @@ Run `./scripts/benchmark.sh` with the following options
   - src/benchmark/common.h
   - src/plots/tools.py
 
-  - XEON_8175M Stats
-    - src/plots/cpu_stats.py
+- XEON_8175M Stats
+  - src/plots/cpu_stats.py

@@ -4,9 +4,9 @@ import os
 import sys
 import numpy as np
 
-from tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
-from tools import calc_GFLOPs, get_AIs
-from cpu_stats import XEON_8175M_PEAK_FLOPS, XEON_8175M_PEAK_BW
+from .tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
+from .tools import calc_GFLOPs, get_AIs
+from .cpu_stats import XEON_8175M_PEAK_FLOPS, XEON_8175M_PEAK_BW
 
 if len(sys.argv) < 8:
     print("expected 7 arguments: mat_dir n_runs b_num_col test_gimmik TIMESTAMP plot_dir ref_is_dense")
@@ -48,7 +48,7 @@ for i_title, shape in enumerate(shapes):
     else:
         custom_GFLOPs, ref_GFLOPs = \
             calc_GFLOPs(mat_flops, mat_paths, trait, B_NUM_COL, TEST_GIMMIK)
-        if REF_IS_DENSE = "1":
+        if REF_IS_DENSE == "1":
             custom_AIs, ref_AIs = get_AIs(mat_paths, TEST_GIMMIK)
         else:
             custom_AIs, _ = get_AIs(mat_paths, TEST_GIMMIK)

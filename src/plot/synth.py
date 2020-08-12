@@ -3,7 +3,7 @@ import os
 import sys
 import numpy as np
 
-from tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
+from .tools import calc_FLOPS, load_benchmark_data, get_perf, B_TARGET_PANEL_WIDTH
 
 if len(sys.argv) < 7:
     print("expected 6 arguments: mat_dir n_runs b_num_col test_gimmik TIMESTAMP plot_dir")
