@@ -18,8 +18,9 @@ Made to compare the Register Packing addition to LIBXSMM small-sparse A operator
     - GiMMiK in "./../GiMMiK" and installed
 
 ## Flow
+Checkout to the commits you want to test in reference and custom LIBXSMMs.
+
 Run `./scripts/benchmark.sh` with the following options
-  - Checkout to the commits you want to test in reference and custom LIBXSMMs.
   - If also testing GiMMiK:
     - -g : 1 (Default is 0)
   - -o : log output dir
@@ -31,6 +32,7 @@ Run `./scripts/benchmark.sh` with the following options
   - -s : skip benchmark process, plot a previous run
     - Other options above still required
     - Default is 0 (don't skip)
+    - Provide the timestamp of the previous run you want to plot
 
 ## Hardcoded values
 - Block alignment = 48
